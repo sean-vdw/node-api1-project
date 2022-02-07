@@ -14,7 +14,7 @@ server.get('/api/users', (req, res) => {
     })
     .catch(err => {
       res.status(500).json({
-        message: `Could not fetch users...`,
+        message: `The users information could not be retrieved`,
         error: err.message,
       })
     })
@@ -23,12 +23,18 @@ server.get('/api/users', (req, res) => {
 // --> Get User with Specific ID
 server.get('/api/users/:id', async (req, res) => {
   const { id } = req.params;
+  const user = await Users.findById(id);
   try {
-    const user = await Users.findById(id);
-    res.json(user);
+    if (user === undefined || user === null) {
+      res.status(404).json({
+        message: 'The user with the specified ID does not exist'
+      })
+    } else {
+      res.json(user);
+    }
   } catch(err) {
       res.status(500).json({
-        message: `Could not get user with id ${id}...`,
+        message: `The user information could not be retrieved`,
         error: err.message,
       })
     }
@@ -39,7 +45,7 @@ server.post('/api/users', async (req, res) => {
   try {
     if (!req.body.name || !req.body.bio) {
       res.status(400).json({
-        message: 'Name and Bio are both required...'
+        message: 'Please provide name and bio for the user'
       })
     } else {
       const newUser = await Users.insert(req.body);
@@ -47,13 +53,15 @@ server.post('/api/users', async (req, res) => {
     }
   } catch(err) {
     res.status(500).json({
-      message: `Could not insert new user...`,
+      message: `There was an error while saving the user to the database`,
       error: err.message,
     })
   }
 });
 
 // --> Put/ Update User with Specified ID
+
+
 // --> Delete User
 
 module.exports = server; 
