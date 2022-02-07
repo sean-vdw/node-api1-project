@@ -63,5 +63,22 @@ server.post('/api/users', async (req, res) => {
 
 
 // --> Delete User
+server.delete('/api/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const deletedUser = await Users.remove(id);
+  try {
+    if (deletedUser === null || deletedUser === undefined) {
+      res.status(404).json({
+        message: 'The user with the specified ID does not exist'
+      })
+    } else {
+      res.json(deletedUser)
+    }
+  } catch(err) {
+    res.status(500).json({
+      message: 'The user could not be removed'
+    })
+  }
+});
 
 module.exports = server; 
